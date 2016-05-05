@@ -1,14 +1,16 @@
+let _id = 0;
+
 class Entity {
   constructor() {
-    this._id = 0; //TODO: setup id
+    this._id = ++_id;
   }
 
-  addComponent(component) {
-    if(component instanceof Component) {
-      this[component.constructor.name.toLowerCase()] = component;
-    } else {
-      throw("Argument is not an instance of class 'Component'");
-    }
+  addComponent(...components) {
+    components.forEach(function (component) {
+      if(component instanceof Component) {
+        this[component.constructor.name.toLowerCase()] = component;
+      }
+    }, this);
   }
 
   removeComponent(component) {
