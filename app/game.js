@@ -6,6 +6,7 @@ class Game {
 
     this.rightScore = 0;
     this.leftScore = 0;
+    this._scores = {};
   }
 
   setup(canvas) {
@@ -56,20 +57,34 @@ class Game {
       new PositionComponent(499, 0)
     );
 
-    let leftGoal = new Entity("wall");
+    let leftGoal = new Entity('wall');
     leftGoal.addComponent(
       new RenderComponent(5, 570, 'black'),
       new PositionComponent(0, 5),
       new CollisionComponent(true)
     );
 
-    let rightGoal = new Entity("wall");
+    let rightGoal = new Entity('wall');
     rightGoal.addComponent(
       new RenderComponent(5, 570, 'black'),
       new PositionComponent(995, 5),
       new CollisionComponent(true)
     );
 
+    let leftScore = new Entity('text');
+    leftScore.addComponent(
+      new TextComponent('0'),
+      new PositionComponent(100, 50)
+    );
+
+    let rightScore = new Entity('text');
+    rightScore.addComponent(
+      new TextComponent('0'),
+      new PositionComponent(870, 50)
+    );
+
+    this._scores['left'] = leftScore;
+    this._scores['right'] = rightScore;
 
     this._entities.push(
       ball,
@@ -79,7 +94,9 @@ class Game {
       bottomWall,
       leftGoal,
       rightGoal,
-      centerLine
+      centerLine,
+      leftScore,
+      rightScore
     );
 
     // setup game systems
@@ -88,7 +105,8 @@ class Game {
       new VelocitySystem(canvas, this._dispatch),
       new InputSystem(canvas, this._dispatch, 38, 40, 81, 65),
       new CollisionSystem(canvas, this._dispatch),
-      new PositionSystem(canvas, this._dispatch)
+      new PositionSystem(canvas, this._dispatch),
+      new TextSystem(canvas, this._dispatch)
     ]);
 
     // setup game events
@@ -113,8 +131,10 @@ class Game {
   score(entity, args) {
     if(args == 'right') {
       this.rightScore++;
+      this._scores['right'].text.text = this.rightScore;
     } else if(args == 'left') {
       this.leftScore++;
+      this._scores['left'].text.text = this.leftScore;
     }
     console.log('Score: ' + this.leftScore + '  ' + this.rightScore);
 

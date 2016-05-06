@@ -186,3 +186,20 @@ class PositionSystem extends System {
     }
   }
 }
+
+class TextSystem extends System {
+  constructor(canvas, dispatch) {
+    super(canvas, dispatch);
+    this._ctx = this._canvas.getContext('2d');
+  }
+
+  // TextSystem assumes that anything with an TextComponent also has a PositionComponent
+  update(entities) {
+    var entities = this.filterEntities('Text', entities);
+
+    for(let i = 0; i < entities.length; i++) {
+      this._ctx.font = '30px Arial';
+      this._ctx.fillText(entities[i].text.text, entities[i].position.x, entities[i].position.y);
+    }
+  }
+}

@@ -46,6 +46,7 @@ class InputComponent extends Component {
 
 class TextComponent extends Component {
   constructor(text) {
+    super();
     this.text = text;
   }
 }
