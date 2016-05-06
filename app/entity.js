@@ -1,8 +1,9 @@
 let _id = 0;
 
 class Entity {
-  constructor() {
+  constructor(name) {
     this._id = ++_id;
+    this.name = name
   }
 
   addComponent(...components) {
@@ -14,7 +15,7 @@ class Entity {
   }
 
   removeComponent(component) {
-    let componentName = typeof component == "string" ? component : component.name();
+    let componentName = typeof component == 'string' ? component : component.name();
 
     delete this[componentName.toLowerCase()];
   }

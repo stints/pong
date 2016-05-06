@@ -13,7 +13,12 @@ class RenderComponent extends Component {
   }
 }
 
-class CollisionComponent extends Component {}
+class CollisionComponent extends Component {
+  constructor(collidable = true) {
+    super();
+    this.collidable = collidable;
+  }
+}
 
 class VelocityComponent extends Component {
   constructor(dx, dy) {

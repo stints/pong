@@ -1,6 +1,7 @@
 class System {
-  constructor(canvas) {
+  constructor(canvas, dispatch) {
     this._canvas = canvas;
+    this._dispatch = dispatch;
   }
 
   filterEntities(filter, entities) {
@@ -15,9 +16,9 @@ class System {
 }
 
 class RenderSystem extends System {
-  constructor(canvas) {
-    super(canvas);
-    this._ctx = this._canvas.getContext("2d");
+  constructor(canvas, dispatch) {
+    super(canvas, dispatch);
+    this._ctx = this._canvas.getContext('2d');
   }
 
   clearCanvas() {
@@ -28,7 +29,7 @@ class RenderSystem extends System {
 
   // RenderSystem assumes that anything with a RenderComponent also has a PositionComponent
   update(entities) {
-    var entities = this.filterEntities("Render", entities);
+    var entities = this.filterEntities('Render', entities);
 
     this.clearCanvas();
 
@@ -49,13 +50,16 @@ class RenderSystem extends System {
 }
 
 class VelocitySystem extends System {
-  constructor(canvas) {
-    super(canvas);
+  constructor(canvas, dispatch) {
+    super(canvas, dispatch);
+
+    // set up event listener
+    this._dispatch.on('collision', this.collisionListener);
   }
 
   // VelocitySystem assumes that anything with a VelocityComponent also has a PositionComponent
   update(entities) {
-    var entities = this.filterEntities("Velocity", entities);
+    var entities = this.filterEntities('Velocity', entities);
 
     for(let i = 0; i < entities.length; i++) {
       let dx = entities[i].velocity.dx;
@@ -68,8 +72,8 @@ class VelocitySystem extends System {
 }
 
 class InputSystem extends System {
-  constructor(canvas, ...allowedKeys) {
-    super(canvas);
+  constructor(canvas, dispatch, ...allowedKeys) {
+    super(canvas, dispatch);
 
     this._keys = {};
     for(let key = 0; key < allowedKeys.length; key++) {
@@ -87,7 +91,7 @@ class InputSystem extends System {
 
   // InputSystem assumes that anything with an InputComponent also has a VelocityComponent
   update(entities) {
-    var entities = this.filterEntities("Input", entities);
+    var entities = this.filterEntities('Input', entities);
 
     for(let i = 0; i < entities.length; i++) {
       let upKey = entities[i].input.upKey;
@@ -97,4 +101,64 @@ class InputSystem extends System {
     }
   }
 
+}
+
+class CollisionSystem extends System {
+  constructor(canvas, dispatch) {
+    super(canvas, dispatch);
+  }
+
+  intersect(entity1, entity2) {
+    return entity1.position.x < entity2.position.x + entity2.render.width &&
+            entity1.position.x + entity1.render.width > entity2.position.x &&
+            entity1.position.y < entity2.position.y + entity2.render.height &&
+            entity1.position.y + entity1.render.height > entity2.position.y;
+  }
+
+  // CollisionSystem assumes that anything with an CollisionComponent also has a PositionComponent
+  update(entities) {
+    var entities = this.filterEntities('Collision', entities);
+
+    for(let i = 0; i < entities.length; i++) {
+      let remainingEntities = entities.slice(i + 1);
+      for(let j = 0; j < remainingEntities.length; j++) {
+        if(entities[i] === remainingEntities[j]) {
+          continue;
+        }
+
+        if(this.intersect(entities[i], remainingEntities[j])) {
+          let dx = 0;
+          let dy = 0;
+
+          if(remainingEntities[j].name == 'wall') {
+            if(entities[i].name == 'ball') {
+              dx = 1;
+              dy = -1;
+            } else if(entities[i].name == 'paddle') {
+              dx = 0;
+              dy = 0;
+              let wHeight = remainingEntities[j].render.height;
+              let eHeight = entities[i].render.height;
+              let wY = remainingEntities[j].position.y;
+              let eY = entities[i].position.y;
+              if(wY + wHeight - 5 <= eY) {
+                entities[i].position.y += 1;
+              }
+              if(wY + 5 >= eY + eHeight) {
+                entities[i].position.y -= 1;
+              }
+            }
+          } else if(remainingEntities[j].name == 'paddle') {
+            if(entities[i].name == 'ball') {
+              dx = -1;
+              dy = 1;
+            }
+          }
+
+          entities[i].velocity.dx *= dx;
+          entities[i].velocity.dy *= dy;
+        }
+      }
+    }
+  }
 }
