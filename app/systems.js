@@ -1,7 +1,7 @@
 class System {
   constructor(canvas, dispatch) {
     this._canvas = canvas;
-    this._dispatch = dispatch;
+    this.dispatch = dispatch;
   }
 
   filterEntities(filter, entities) {
@@ -52,9 +52,6 @@ class RenderSystem extends System {
 class VelocitySystem extends System {
   constructor(canvas, dispatch) {
     super(canvas, dispatch);
-
-    // set up event listener
-    this._dispatch.on('collision', this.collisionListener);
   }
 
   // VelocitySystem assumes that anything with a VelocityComponent also has a PositionComponent
@@ -147,16 +144,43 @@ class CollisionSystem extends System {
               if(wY + 5 >= eY + eHeight) {
                 entities[i].position.y -= 1;
               }
+
             }
           } else if(remainingEntities[j].name == 'paddle') {
             if(entities[i].name == 'ball') {
               dx = -1;
               dy = 1;
+              if(remainingEntities[j].velocity.dy > 0) {
+                dx = -1.2;
+              }
             }
           }
 
           entities[i].velocity.dx *= dx;
           entities[i].velocity.dy *= dy;
+        }
+      }
+    }
+  }
+}
+
+class PositionSystem extends System {
+  constructor(canvas, dispatch) {
+    super(canvas, dispatch);
+  }
+
+  update(entities) {
+    var entities = this.filterEntities('Position', entities);
+
+    for(let i = 0; i < entities.length; i++) {
+      // check for ball crossing score
+      if(entities[i].name == 'ball') {
+        let x = entities[i].position.x;
+
+        if(x < 30) { // right player scores on left
+          this.dispatch.emit('score', entities[i], 'right');
+        } else if(x > 970) { // left player scores on right
+          this.dispatch.emit('score', entities[i], 'left');
         }
       }
     }

@@ -36,12 +36,16 @@ class PositionComponent extends Component {
   }
 }
 
-class PhysicsComponent extends Component {}
-
 class InputComponent extends Component {
   constructor(upKey, downKey) {
     super();
     this.upKey = upKey;
     this.downKey = downKey;
+  }
+}
+
+class TextComponent extends Component {
+  constructor(text) {
+    this.text = text;
   }
 }
