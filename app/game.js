@@ -139,6 +139,10 @@ class Game {
     this._play = true;
     this._info.text.text = '';
     let ball = this._entities[0]; // assume first entity is ball
+    this.rightScore = 0;
+    this.leftScore = 0;
+    this._scores['right'].text.text = this.rightScore;
+    this._scores['left'].text.text = this.leftScore;
     ball.velocity.dx = 5;
     ball.velocity.dy = 5;
     window.requestAnimationFrame(() => this.update());
