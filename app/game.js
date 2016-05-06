@@ -7,6 +7,9 @@ class Game {
     this.rightScore = 0;
     this.leftScore = 0;
     this._scores = {};
+    this._info = null; // special entity to display information
+
+    this._play = false;
   }
 
   setup(canvas) {
@@ -14,7 +17,7 @@ class Game {
     let ball = new Entity('ball');
     ball.addComponent(
       new RenderComponent(10, 10, 'black'),
-      new VelocityComponent(5, 5),
+      new VelocityComponent(0, 0),
       new PositionComponent(495, 285),
       new CollisionComponent(true)
     );
@@ -83,6 +86,12 @@ class Game {
       new PositionComponent(870, 50)
     );
 
+    this._info = new Entity('text');
+    this._info.addComponent(
+      new TextComponent('Move paddle to start'),
+      new PositionComponent(520, 500)
+    );
+
     this._scores['left'] = leftScore;
     this._scores['right'] = rightScore;
 
@@ -96,7 +105,8 @@ class Game {
       rightGoal,
       centerLine,
       leftScore,
-      rightScore
+      rightScore,
+      this._info
     );
 
     // setup game systems
@@ -113,9 +123,24 @@ class Game {
     this._dispatch.on('score', (entity, args) => this.score(entity, args));
 
     canvas.focus();
+
+    this._dispatch.on('keydown', () => this.restart());
+
+    this.update();
+  }
+
+  restart() {
+    if(!this._play) {
+      this.start()
+    }
   }
 
   start() {
+    this._play = true;
+    this._info.text.text = '';
+    let ball = this._entities[0]; // assume first entity is ball
+    ball.velocity.dx = 5;
+    ball.velocity.dy = 5;
     window.requestAnimationFrame(() => this.update());
   }
 
@@ -125,7 +150,9 @@ class Game {
       this._systems[i].update(this._entities);
     }
 
-    window.requestAnimationFrame(() => this.update());
+    if(this._play) {
+      window.requestAnimationFrame(() => this.update());
+    }
   }
 
   score(entity, args) {
@@ -136,7 +163,6 @@ class Game {
       this.leftScore++;
       this._scores['left'].text.text = this.leftScore;
     }
-    console.log('Score: ' + this.leftScore + '  ' + this.rightScore);
 
     if(this.rightScore >= 10 || this.leftScore >= 10) {
       this.gameOver(entity, args);
@@ -155,11 +181,13 @@ class Game {
   }
 
   gameOver(entity, args) {
-    console.log(args + ' won!');
     entity.position.x = 495;
     entity.position.y = 285;
     entity.velocity.dx = 0;
     entity.velocity.dy = 0;
+    this._info.text.text = (args == 'right' ? 'Right' : 'Left') + ' Wins!';
+    this._play = false;
+    this.update();
   }
 
 }

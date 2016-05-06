@@ -84,6 +84,8 @@ class InputSystem extends System {
     if(this._keys.hasOwnProperty(e.keyCode)) {
       this._keys[e.keyCode] = e.type == 'keydown';
     }
+
+    this.dispatch.emit('keydown');
   }
 
   // InputSystem assumes that anything with an InputComponent also has a VelocityComponent

@@ -8,7 +8,7 @@ class MessageDispatcher {
     this._events[type] = callback;
   }
 
-  emit(type, entity, args = null) {
+  emit(type, entity = null, args = null) {
     if(this._events.hasOwnProperty(type)) {
       this._events[type](entity, args);
     }
