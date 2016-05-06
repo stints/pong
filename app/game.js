@@ -60,15 +60,15 @@ class Game {
       new PositionComponent(499, 0)
     );
 
-    let leftGoal = new Entity('wall');
-    leftGoal.addComponent(
+    let leftWall = new Entity('wall');
+    leftWall.addComponent(
       new RenderComponent(5, 570, 'black'),
       new PositionComponent(0, 5),
       new CollisionComponent(true)
     );
 
-    let rightGoal = new Entity('wall');
-    rightGoal.addComponent(
+    let rightWall = new Entity('wall');
+    rightWall.addComponent(
       new RenderComponent(5, 570, 'black'),
       new PositionComponent(995, 5),
       new CollisionComponent(true)
@@ -101,8 +101,8 @@ class Game {
       rightPaddle,
       topWall,
       bottomWall,
-      leftGoal,
-      rightGoal,
+      leftWall,
+      rightWall,
       centerLine,
       leftScore,
       rightScore,
