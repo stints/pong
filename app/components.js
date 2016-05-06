@@ -1,4 +1,8 @@
-class Component {}
+class Component {
+  name() {
+    return this.constructor.name.toLowerCase().replace('component','');
+  }
+}
 
 class RenderComponent extends Component {
   constructor(width, height, color) {
@@ -12,10 +16,10 @@ class RenderComponent extends Component {
 class CollisionComponent extends Component {}
 
 class VelocityComponent extends Component {
-  constructor() {
+  constructor(dx, dy) {
     super();
-    this.dx = 0;
-    this.dy = 0;
+    this.dx = dx;
+    this.dy = dy;
   }
 }
 
@@ -30,9 +34,9 @@ class PositionComponent extends Component {
 class PhysicsComponent extends Component {}
 
 class InputComponent extends Component {
-  constructor(downKey, upKey) {
+  constructor(upKey, downKey) {
     super();
-    this.downKey = downKey;
     this.upKey = upKey;
+    this.downKey = downKey;
   }
 }
