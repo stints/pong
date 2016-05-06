@@ -116,9 +116,13 @@ class Game {
     } else if(args == 'left') {
       this.leftScore++;
     }
-
-    this.resetBall(entity);
     console.log('Score: ' + this.leftScore + '  ' + this.rightScore);
+
+    if(this.rightScore >= 10 || this.leftScore >= 10) {
+      this.gameOver(entity, args);
+    } else {
+      this.resetBall(entity);
+    }
   }
 
   resetBall(entity) {
@@ -128,6 +132,14 @@ class Game {
     let dy = entity.velocity.dy / -entity.velocity.dy * 5;
     entity.velocity.dx = dx;
     entity.velocity.dy = dy;
+  }
+
+  gameOver(entity, args) {
+    console.log(args + ' won!');
+    entity.position.x = 495;
+    entity.position.y = 285;
+    entity.velocity.dx = 0;
+    entity.velocity.dy = 0;
   }
 
 }
